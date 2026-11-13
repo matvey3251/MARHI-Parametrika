@@ -1,5 +1,32 @@
 <!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FORMA — равносторонний потолок</title><link rel="stylesheet" href="hex-ceiling.css"><script defer src="hex-ceiling.js"></script></head><body data-page="ceiling">
 <header><a href="index.html">FORMA / MARHI</a><nav><a href="ceiling-equal-cells.html" aria-current="page">Равносторонний потолок</a><a id="other" href="hex-attachment-points.html">Точки подвеса</a></nav></header>
 <main><h1>Потолок из сменных ячеек</h1><p>Решётка из правильных шестиугольников. Каждая вставка опирается бортиком на своё ложе. Аттрактор меняет глубину вставок, сохраняя одинаковый размер контура.</p>
-<div class="layout"><section><div class="views"><label for="view">Вид</label><select id="view"><option value="volume">Объём снизу</option><option value="plan">План</option><option value="frame">Каркас без вставок</option></select></div><svg id="scene" role="img" aria-label="Ячеистый каркас потолка"></svg><p id="summary" aria-live="polite"></p></section>
-<aside><h2>Параметры</h2><div id="controls"></div><p>Зазор указан на сторону, перпендикулярно ребру. Вставка и её ложе имеют одинаковое число сторон. Габарит решётки меняется с количеством модулей.</p></aside></div></main></body></html>
+<div class="layout"><section><div class="views"><label for="view">Вид</label><select id="view"><option value="volume">Объём снизу</option><option value="plan">План</option><option value="frame">Каркас без вставок</option></select></div><svg id="scene" role="img" aria-label="Ячеистый каркас потолка"></svg><p id="summary" aria-live="polite"></p><button type="button" class="btn" id="stl">↓ Скачать STL</button><p class="smallnote">STL в миллиметрах. Экспорт следует текущим настройкам. Для печати проверьте масштаб и расположение деталей в слайсере.</p></section>
+<aside><h2>Параметры</h2><div id="controls"></div><p>Зазор указан на сторону, перпендикулярно ребру. Вставка и её ложе имеют одинаковое число сторон. Габарит решётки меняется с количеством модулей.</p></aside></div></main><script src="stl-export.js"></script><script>
+document.addEventListener('DOMContentLoaded',()=>{
+FormaSTL.bind(document.getElementById('stl'),()=>{
+  const p=Object.fromEntries([...inputs].map(([key,input])=>[key,Number(input.value)]));
+  const {cells,points,height}=layout(p);
+  const mesh=new FormaSTL.Mesh();
+  const frame=[];
+  const opening=p.side-p.rib/(2*cos30), insert=opening-p.gap/cos30;
+  const layer=(c,r,z)=>hex(c.x,c.y,r).map(([x,y])=>[x,y,z]);
+  for(const c of cells){
+    const outer=layer(c,p.side,0), inner=layer(c,opening,0);
+    outer.forEach((a,i)=>{const j=(i+1)%6;frame.push([a,outer[j],inner[j],inner[i]]);});
+    if(!mount && byId('view').value!=='frame'){
+      const axis=p.axis*height/100;
+      const influence=1-Math.min(1,Math.abs(c.y-axis)/Math.max(1,axis,height-axis));
+      const depth=p.depth*(1-p.gradient/100*(1-influence));
+      mesh.cell(layer(c,insert,0),layer(c,insert*.49,depth),true,([x,y,z])=>[x,y,z-2]);
+    }
+  }
+  mesh.shell(frame,([x,y,z])=>[x,y,z-6]);
+  if(mount)for(const {x,y} of points){
+    mesh.cable([x,y,0],[x,y,8],Math.min(p.rib*.6,10));
+    mesh.cable([x,y,8],[x,y,p.length+8]);
+  }
+  mesh.save(mount?'forma-hex-attachment-layout':'forma-hex-ceiling');
+});
+});
+</script></body></html>

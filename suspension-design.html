@@ -13,7 +13,7 @@
 <main><div class="heading"><div><h1>Подвес потолка</h1><p>Сравните нижние и верхние узлы и проверьте расположение тросов на схеме.</p></div></div>
 <div class="mount-grid"><section class="card"><h2>Схема конструкции</h2>
 <svg id="diagram" viewBox="0 0 760 460" role="img" aria-labelledby="diagram-title"><title id="diagram-title">Схема подвесного потолка</title></svg>
-<p id="summary" aria-live="polite"></p><p class="note">Длина измеряется между верхней и нижней точками троса, без концевой фурнитуры. Положение узлов условное.</p></section>
+<p id="summary" aria-live="polite"></p><button type="button" class="btn" id="stl">↓ Скачать STL</button><p class="smallnote">STL в миллиметрах. Экспорт следует текущим настройкам. Для печати проверьте масштаб и расположение деталей в слайсере.</p><p class="note">Длина измеряется между верхней и нижней точками троса, без концевой фурнитуры. Положение узлов условное.</p></section>
 <aside><h2>Настройки подвеса</h2>
 <label for="scheme">Тип конструкции</label><select id="scheme"><option value="frame">Периметральная кассета · бумага</option><option value="rails">Две монтажные рейки · 3D-печать</option></select>
 <label for="count">Количество тросов <output id="count-value"></output></label><input id="count" type="range" min="3" max="12" value="6">
@@ -21,4 +21,26 @@
 <details><summary>Длина каждого троса</summary><p class="note">Можно задать отдельную длину. Схема покажет разброс нижних отметок.</p><div id="lengths"></div></details>
 <h3>Панель → тросы</h3><p id="lower"></p><h3>Тросы → основание</h3><p id="upper"></p>
 <p class="note">Лоток и светильник на фото служат ориентирами. Верхние узлы показаны на подтверждённом несущем металле. До монтажа нужны обмеры, согласование и расчёт основания, фурнитуры и нагрузки.</p>
-</aside></div></main><script src="suspension-design.js"></script></body></html>
+</aside></div></main><script src="suspension-design.js"></script><script src="stl-export.js"></script><script>
+FormaSTL.bind(document.getElementById('stl'),()=>{
+  const values=[...lengths.querySelectorAll('input')].map(validLength);
+  const mesh=new FormaSTL.Mesh(), rows=[[],[]];
+  values.forEach((value,i)=>{
+    const row=i%2, columns=Math.ceil((values.length-row)/2);
+    const x=columns===1?900:1800*Math.floor(i/2)/(columns-1);
+    const p=[x,row*450,-value*1000];
+    rows[row].push(p);
+    mesh.cable(p,[x,row*450,0]);
+    mesh.cable([x,row*450,-value*1000-8],p,7);
+  });
+  for(const row of rows){
+    for(let i=1;i<row.length;i++)mesh.cable(row[i-1],row[i],8);
+    mesh.cable([0,row[0][1],0],[1800,row[0][1],0],10);
+  }
+  if(scheme.value==='frame'){
+    mesh.cable(rows[0][0],rows[1][0],8);
+    mesh.cable(rows[0].at(-1),rows[1].at(-1),8);
+  }
+  mesh.save('forma-suspension-'+scheme.value);
+});
+</script></body></html>
