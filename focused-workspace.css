@@ -1,0 +1,63 @@
+@media screen{
+html:has(.focused-workspace){background:#242b27;height:100%;overflow:hidden}
+body.focused-workspace{height:100dvh;display:grid;grid-template-rows:64px 54px minmax(0,1fr);overflow:hidden;background:#242b27;color:#edf1e6}
+.focused-workspace>header{height:64px;min-height:0;padding:0 24px;border-bottom:1px solid #465345;background:#242b27}
+.focused-workspace .back-home{font-size:12px}
+.focused-workspace .project-nav{background:#2b352e;border-color:#465345;padding:7px 24px}
+.focused-workspace .project-nav label,.focused-workspace .project-nav a{color:#c6d2bc}
+.focused-workspace .project-nav select{background:#354237;color:#edf1e6;border-color:#64765e;padding:7px 12px}
+.focused-workspace .project-nav{flex-wrap:nowrap}
+.focused-workspace .project-nav label{width:auto}
+.focused-workspace .project-nav select{max-width:390px}
+.focused-workspace .layout{display:grid;grid-template-columns:330px minmax(0,1fr);height:auto;min-height:0}
+.focused-workspace .sidebar{grid-column:1;grid-row:1;overflow:auto;background:#2c372f;border:0;border-right:1px solid #465345;padding:18px 20px;min-height:0}
+.focused-workspace .workspace{grid-column:2;grid-row:1;height:auto;min-height:0;padding:18px;gap:12px;overflow:hidden}
+.focused-workspace .topline{display:block}.focused-workspace h1{font-size:24px;color:#edf1e6}.focused-workspace .subtitle{color:#b9c6af;font-size:11px}
+.focused-workspace .stage{flex:1;min-height:0;height:auto;border-color:#53634c;border-radius:8px}
+.focused-workspace .toolbar{position:static;display:flex;background:#202b24;box-shadow:none;padding:4px;margin:12px 0 8px}
+.focused-workspace .toolbar button{flex:1;color:#cad5c2;padding:9px 5px;font-size:11px;min-height:38px}
+.focused-workspace .toolbar button.active{background:#c9d6bb;color:#243126}
+.focused-workspace .headright{display:grid;grid-template-columns:1fr 1fr;margin-bottom:16px}
+.focused-workspace .headright .tag{display:none}
+.focused-workspace .sidebar h2{font-size:20px;color:#edf1e6;margin:12px 0}
+.focused-workspace .btn,.focused-workspace .upload{background:#394738;border-color:#65765c;color:#edf1e6}
+.focused-workspace .btn:hover{background:#4b5d45}
+.focused-workspace input[type=number],.focused-workspace select{color:#edf1e6;background:#202b24;border-color:#627459}
+.focused-workspace .control label,.focused-workspace .switchlabel,.focused-workspace .sidebar details>summary,.focused-workspace .export-panel h3{color:#e0e9d7}
+.focused-workspace .smallnote,.focused-workspace .intro,.focused-workspace .control-help,.focused-workspace .control-unit,.focused-workspace .rangeends{color:#b4c3aa}
+.focused-workspace .attractor{background:#354333;border-color:#687a5d}
+.focused-workspace .section,.focused-workspace .export-panel{border-color:#52624a}
+.focused-workspace .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.focused-workspace .stat small,.focused-workspace .stat b span{color:#b6c4ac}
+.focused-workspace .stat b{color:#edf1e6;font-size:17px}
+.focused-workspace .control-number{background:#202b24;border-color:#65765c}
+.focused-workspace canvas{cursor:grab}
+.focused-workspace .presets{flex-wrap:wrap}
+.focused-workspace .paperpick{display:none}
+.focused-workspace [hidden]{display:none!important}
+@media(max-width:700px){
+body.focused-workspace{grid-template-rows:62px 50px minmax(0,1fr)}
+.focused-workspace>header{padding:12px;height:62px;flex-wrap:nowrap}
+.focused-workspace .brand{font-size:20px}
+.focused-workspace .brand span{display:none}
+.focused-workspace .project-nav{padding:5px 10px;flex-wrap:nowrap;gap:8px}
+.focused-workspace .project-nav label{display:none}
+.focused-workspace .project-nav select{font-size:12px;width:100%}
+.focused-workspace .layout{display:grid;grid-template-columns:145px minmax(0,1fr)}
+.focused-workspace .sidebar{padding:12px 9px}
+.focused-workspace .workspace{padding:8px;gap:8px}
+.focused-workspace h1{font-size:16px;letter-spacing:-.3px}
+.focused-workspace .subtitle{display:none}
+.focused-workspace .sidebar h2{font-size:16px}
+.focused-workspace .control label{font-size:11px;flex-wrap:wrap}
+.focused-workspace .headright{grid-template-columns:1fr}
+.focused-workspace .stats{grid-template-columns:1fr}
+.focused-workspace .toolbar{flex-direction:column}
+.focused-workspace .legend,.focused-workspace .hint,.focused-workspace .scale{display:none}
+.focused-workspace .variant-actions .btn{font-size:11px;padding:7px}
+.focused-workspace .control-number{width:70px}
+.focused-workspace .export-panel{grid-template-columns:1fr}
+}
+.focused-workspace{display:grid;height:100dvh;min-height:0}
+.focused-workspace .layout{max-height:100%;overflow:hidden}
+}

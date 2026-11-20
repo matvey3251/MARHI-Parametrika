@@ -1,17 +1,6 @@
 'use strict';
 (() => {
-  const groups = [
-    ['Потолки',[
-      ['ceiling-original.html','Исходная форма'],
-      ['ceiling-recesses-down.html','Углубления вниз'],
-      ['ceiling-equal-cells.html','Равносторонние ячейки']]],
-    ['Изготовление',[
-      ['cell-paper-template.html','Ячейка и развёртка'],
-      ['cell-symmetric.html','Симметричная ячейка']]],
-    ['Монтаж',[
-      ['suspension-design.html','Схемы подвеса'],
-      ['hex-attachment-points.html','Точки крепления']]]
-  ];
+  const groups = [['Потолки',[['ceiling-original.html','Исходная форма'],['ceiling-recesses-down.html','Углубления вниз']]]];
   const nav = document.createElement('nav');
   nav.className = 'project-nav';
   nav.setAttribute('aria-label','Навигация проекта');
