@@ -34,8 +34,9 @@
     });
     return dirs.map(d=>[p[0]+d[0]*radius,p[1]+d[1]*radius]);
   }
-  function prepare(cells,{gap,regular,sides,field,width,length,count}){
-    if(regular&&[3,4,6].includes(sides))cells=tiled(width,length,count,sides);
+  function prepare(cells,{gap,regular,sides,field,width,length,count,density=1}){
+    const packed=regular&&[3,4].includes(sides);
+    if(packed)cells=adaptive(width,length,count,sides,field,density,gap);
     const result=[];
     for(const cell of cells){
       const tile=cell.poly;
@@ -50,7 +51,7 @@
         }
       }
       const p=center(poly);
-      if(regular&&![3,4,6].includes(sides))poly=regularInside(poly,p,sides);
+      if(regular&&!packed)poly=regularInside(poly,p,sides);
       const inradius=Math.min(...poly.map((a,i)=>{
         const b=poly[(i+1)%poly.length],dx=b[0]-a[0],dy=b[1]-a[1];
         return Math.abs(dy*(p[0]-a[0])-dx*(p[1]-a[1]))/Math.hypot(dx,dy);
@@ -89,8 +90,7 @@
       if(poly.every(([x,y])=>x>=-width/2-1e-8&&x<=width/2+1e-8&&y>=-length/2-1e-8&&y<=length/2+1e-8))tiles.push({poly});
     };
     if(sides===4){
-      const nx=Math.max(1,Math.floor(width/side)),ny=Math.max(1,Math.floor(length/side));
-      const size=Math.min(width/nx,length/ny);
+      const nx=Math.max(1,Math.round(width/side)),size=width/nx,ny=Math.max(1,Math.floor(length/size));
       for(let y=0;y<ny;y++)for(let x=0;x<nx;x++){
         const a=(x-nx/2)*size,b=(y-ny/2)*size;
         add([[a,b],[a+size,b],[a+size,b+size],[a,b+size]]);
@@ -111,6 +111,42 @@
     }
     return tiles;
   }
-  root.CellLayout={prepare,area,center,inset,regularInside,ring,frame,tiled};
+  function adaptive(width,length,count,sides,field,density,gap){
+    if(density<=1)return tiled(width,length,count,sides);
+    const tiles=tiled(width,length,Math.max(4,Math.floor(count/16)),sides);
+    const midpoint=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
+    const split=tile=>{
+      const p=tile.poly,m=p.map((a,i)=>midpoint(a,p[(i+1)%p.length]));
+      if(sides===3)return [[p[0],m[0],m[2]],[m[0],p[1],m[1]],[m[2],m[1],p[2]],[m[0],m[1],m[2]]];
+      const c=center(p);
+      return p.map((a,i)=>[a,m[i],c,m[(i+3)%4]]);
+    };
+    const scores=tile=>{
+      const c=center(tile.poly);
+      const samples=[c,...tile.poly.map(p=>midpoint(p,c))];
+      const influence=Math.max(...samples.map(p=>field(...p)));
+      return area(tile.poly)*(1+(density*density-1)*influence*influence);
+    };
+    const valid=poly=>{
+      const insetPoly=inset(poly,gap/2+.0003);
+      if(insetPoly.length<3||area(insetPoly)<.00015)return false;
+      const c=center(insetPoly);
+      return insetPoly.every((a,i)=>{
+        const b=insetPoly[(i+1)%insetPoly.length],dx=b[0]-a[0],dy=b[1]-a[1];
+        return Math.abs(dy*(c[0]-a[0])-dx*(c[1]-a[1]))/Math.hypot(dx,dy)>=.0121;
+      });
+    };
+    const blocked=new Set();
+    while(tiles.length+3<=count){
+      let best=-1,score=-Infinity;
+      tiles.forEach((tile,i)=>{if(!blocked.has(tile)){const value=scores(tile);if(value>score){score=value;best=i;}}});
+      if(best<0)break;
+      const selected=tiles[best],children=split(selected);
+      if(!children.every(valid)){blocked.add(selected);continue;}
+      tiles.splice(best,1,...children.map(poly=>({poly})));
+    }
+    return tiles;
+  }
+  root.CellLayout={prepare,area,center,inset,regularInside,ring,frame,tiled,adaptive};
   if(typeof module!=='undefined')module.exports=root.CellLayout;
 })(globalThis);
